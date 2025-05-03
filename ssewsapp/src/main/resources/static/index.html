@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SSE</title>
+</head>
+<body>
+
+<label>amperage: </label>
+<il id="amperageChanges"></il></br>
+
+<label>voltage: </label>
+<il id="voltageChanges"></il>
+
+<script type="application/javascript">
+    const amperageChanges = document.getElementById("amperageChanges");
+    const voltageChanges = document.getElementById("voltageChanges");
+
+    const eventSource = new EventSource("/open-measurement-stream");
+
+    eventSource.onmessage = e => {
+        const response = JSON.parse(e.data);
+
+        amperageChanges.innerHTML = response.amperage;
+        voltageChanges.innerHTML = response.voltage;
+    }
+    eventSource.onopen = e => console.log('Connection opened');
+    eventSource.onerror = e => console.log('Connection closed');
+</script>
+</body>
+</html>
