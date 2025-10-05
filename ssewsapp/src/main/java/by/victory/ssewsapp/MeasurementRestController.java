@@ -15,7 +15,7 @@ public class MeasurementRestController {
 
     @PostMapping("/measurement")
     public int publishMeasurement(@RequestBody Measurement measurement) {
-        publisher.publishEvent(new Measurement(measurement.amperage, measurement.voltage));
+        publisher.publishEvent(measurement);
         return 200;
     }
 }
