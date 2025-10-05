@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -21,8 +22,8 @@ class MeasurementRestControllerTest {
     public void getMeasurementAndPublishEvent() {
         Measurement measurement = new Measurement(10, 20);
 
-        int responseStatus = measurementRestController.publishMeasurement(measurement);
-        Assertions.assertEquals(200, responseStatus);
+        HttpStatus responseStatus = measurementRestController.publishMeasurement(measurement);
+        Assertions.assertEquals(HttpStatus.OK, responseStatus);
         Mockito.verify(applicationEventPublisher).publishEvent(measurement);
     }
 }

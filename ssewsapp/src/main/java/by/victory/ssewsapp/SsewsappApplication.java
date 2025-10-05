@@ -7,9 +7,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @SpringBootApplication
 public class SsewsappApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(SsewsappApplication.class, args);
     }
-
 }
