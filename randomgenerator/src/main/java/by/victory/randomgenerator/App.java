@@ -1,35 +1,31 @@
 package by.victory.randomgenerator;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Random;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class App {
-    public static void main(String[] args) throws IOException, InterruptedException, JSONException {
-        Random random = new Random();
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
+    private volatile boolean running = true;
 
-        JSONObject requestBody = new JSONObject();
+    public static void main(String[] args) {
+        new App().run();
+    }
 
-        HttpClient client = HttpClient.newHttpClient();
+    public void run() {
+        int sendDelay = Integer.parseInt(PropertyReader.getProperty("sendDelayMs"));
+        ChannelHttpClientFacade facade = new ChannelHttpClientFacade();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> running = false));
 
-        for (; ; ) {
-            requestBody.put("amperage", random.nextInt(100 - 1) + 1);
-            requestBody.put("voltage", random.nextInt(100 - 1) + 1);
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .header("Content-Type", "application/json")
-                    .uri(URI.create("http://localhost:8080/measurement"))
-                    .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            Thread.sleep(400);
+        while (running) {
+            try {
+                facade.getMeasurementAndSend();
+                Thread.sleep(sendDelay);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            } catch (Exception e) {
+                logger.error("Error in main loop", e);
+            }
         }
     }
 }
